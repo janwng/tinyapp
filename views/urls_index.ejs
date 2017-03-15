@@ -11,12 +11,17 @@
   <h1>Full URLS and Shortened URLS</h1>
   <ul>
     <% for (item in urls) { %>
-      <li><%= item %> - <%= urls[item] %></li>
+      <li>
+        <a href="/urls/<%= item%>">
+          <%= item %> - <%= urls[item] %>
+        </a>
 
-      <form action="/urls/<%= item %>/delete" method="POST">
+        <form action="/urls/<%= item %>/delete" method="POST">
+          <button>DELETE</button>
+        </form>
 
-        <button>DELETE</button>
-      </form>
+        <a href="/urls/<%= item %>"> Edit </a>
+    </li>
 
     <% } %>
   </ul>

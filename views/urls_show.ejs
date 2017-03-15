@@ -10,15 +10,19 @@
   <h1>Individual Full URL and Shortened URL</h1>
   <ul>
       <li>Short URL: <%= shortURL %></li>
-      <li>Long URL: <%= longURL %></li>
-  </ul>
+ </ul>
 
   <br>
 
   <h3>Update your link</h3>
-  <form>
-    <input type="text" name="long URL" placeholder="Enter a new URL">
-    <input type="submit" value="SUBMIT">
+
+  <!-- correlate to the path and method in server.js -->
+  <form action="/urls/<%= shortURL %>" method="POST">
+
+  <!-- 'name=' correlates with the key in req.body so {longURL: www.amazon.com} -->
+    <input type="text" name="longURL" value=<%= longURL %>>
+
+    <input type="submit" value="UPDATE">
   </form>
 
 </body>

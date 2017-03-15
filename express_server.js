@@ -100,8 +100,15 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
 
-  console.log(urlDatabase);
   //after delete redirect back to urls_index page
+  res.redirect('/urls');
+});
+
+//update to exist existing urls
+app.post("/urls/:shortURL", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.longURL;
+
+  //after updating, redirect client back to index page
   res.redirect('/urls');
 });
 
@@ -110,9 +117,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 
 
+//log out the (longurl) link that user input into the form
+app.get("/urls/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL];
 
-
-
+  let templateVars = { shortURL, longURL }
+  res.render("urls_show", templateVars);
+});
 
 
 
