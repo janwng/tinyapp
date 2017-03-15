@@ -3,9 +3,12 @@ var app = express();
 var PORT = process.env.PORT || 8080; //default port 8080
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
 
+// Configuration
 app.set("view engine", "ejs");
+
+// Middlewares
+app.use(bodyParser.urlencoded({extended: true}));
 
 //function to generate 6 random numbers and letters
 function generateRandomString() {
@@ -84,9 +87,6 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
 })
 
-
-
-
 //add page for displaying a single URL and its shortened form
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
@@ -96,6 +96,14 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//delete to remove exisitng shortened uRLS from database
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+
+  console.log(urlDatabase);
+  //after delete redirect back to urls_index page
+  res.redirect('/urls');
+});
 
 
 
