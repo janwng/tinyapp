@@ -16,10 +16,8 @@ function generateRandomString() {
     randomString += possCharacters.charAt(Math.floor(Math.random() * possCharacters.length));
   }
 
-  console.log(randomString);
+return randomString;
 }
-
-generateRandomString();
 
 
 var urlDatabase = {
@@ -63,16 +61,33 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+//log out the (longurl) link that user input into the form
+app.post("/urls", (req, res, next) => {
+  console.log("req.body: ", req.body);
+  // res.send("Ok");
+
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+
+  //add new longurl & short url to the urldatabse obj
+  urlDatabase[shortURL] = longURL;
+
+//   console.log(urlDatabase);
+// }, function(req, res) {
+
+  //redirect page
+  res.redirect('/urls/'+shortURL);
 });
+
+
+
+
 
 
 //add page for displaying a single URL and its shortened form
 app.get("/urls/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL];
 
   let templateVars = { shortURL, longURL }
   res.render("urls_show", templateVars);
