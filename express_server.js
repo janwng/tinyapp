@@ -79,7 +79,10 @@ app.post("/urls", (req, res, next) => {
   res.redirect('/urls/'+shortURL);
 });
 
-
+//if user inputs short url send them to the long url website
+app.get("/u/:shortURL", (req, res) => {
+  res.redirect(urlDatabase[req.params.shortURL]);
+})
 
 
 
