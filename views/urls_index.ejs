@@ -1,0 +1,19 @@
+<html lang="en">
+
+<head>
+  <title>TinyApp</title>
+</head>
+
+<body>
+
+  <h1>Full URLS and Shortened URLS</h1>
+  <ul>
+    <% for (item in urls) { %>
+      <li><%= item %> - <%= urls[item] %></li>
+    <% } %>
+  </ul>
+
+  <a href="#">Shorten a URL</a>
+</body>
+
+</html>
