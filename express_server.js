@@ -7,6 +7,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
+//function to generate 6 random numbers and letters
+function generateRandomString() {
+  var randomString = "";
+  var possCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 6; i++) {
+    randomString += possCharacters.charAt(Math.floor(Math.random() * possCharacters.length));
+  }
+
+  console.log(randomString);
+}
+
+generateRandomString();
+
+
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xk": "http://www.google.com"
