@@ -183,34 +183,30 @@ app.get("/register", (req, res) => {
 //create registration page
 app.post("/register", (req, res) => {
 
+  //check if email or password is input
+  //send error if no email/pw input
+  if(!req.body.email || !req.body.password) {
+    res.status(400).send('Please input email and password'); // should this be res.status?
+    return; //end the response and don't excute code below
+  }
+
+  //now check if the input email already exists
+  for (let randomID in users) {
+    if(req.body.email === users[randomID].email) {
+      res.status(400).send('Email already exists');
+      return; //don't excute code below
+    }
+  }
+
   //add new user object into the user object
   let user = addUser(req.body.email, req.body.password);   //now can call user.email user.password etc
 
   //set cookie for random generated id (comes from the object from addUser)
   res.cookie('user_id', user.id);
 
-  //send error if no email/pw input
-  if(!req.body.email || !req.body.password) {
-    res.status(400).send('Please input email and password'); // should this be res.status?
-  } else {
-    res.redirect('/urls');
-  }
-
-  //send error if email already exists by checking in users object
-  for (let randomID in users) {
-    if(req.body.email === users[randomID].email) {
-      var emailExists = true;
-    }
-  }
-
-  if(emailExists) {
-    res.status(400).send('Email already exists');
-  } else if (emailExists === false ) {
-    res.redirect('/urls');
-  }
+  res.redirect('/urls');
 
   console.log(users);
-
 });
 
 
