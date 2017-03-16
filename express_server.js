@@ -66,7 +66,11 @@ app.get("/urls", (req, res) => {
 
 //add page for url input form
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 //log out the (longurl) link that user input into the form
@@ -105,7 +109,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 //delete to remove exisitng shortened uRLS from database
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
 
   //after delete redirect back to urls_index page
@@ -128,11 +132,14 @@ app.post("/login", (req, res) => {
   //and is what the user inputs into form
   res.cookie('username', req.body.username);
 
-
   //after server has set cookie redirect browser back to home
-  res.redirect('/');
-
+  res.redirect('/urls');
 });
+
+app.post("/logout", (req, res) => {
+  res.cookie('username', '');
+  res.redirect('/urls');
+})
 
 
 
