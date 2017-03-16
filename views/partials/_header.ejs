@@ -1,7 +1,6 @@
 <title>TinyApp</title>
 
-<% if(username) { %>
-  <h5>Your Username: <%= username %></h5>
+<% if(user) { %>
 
   <form action="/logout" method="POST">
     <input type="submit" value="LOG OUT">
@@ -9,11 +8,7 @@
 
 <% } else { %>
 
-  <form action="/login" method="POST">
-    <!-- 'name=' must be same as value parameter in res.cookie(name, value, options) -->
-    <!-- 'value=' is whatever the user inputs into the form -->
-    <input type="text" name="username" value="">
-    <input type="submit" value="LOG IN">
-  </form>
+  <a href="/register"><h3>Create an Account</h3></a>
+  <a href="/login"><h3>Log In</h3></a>
 
 <% } %>

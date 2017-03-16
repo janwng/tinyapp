@@ -63,6 +63,8 @@ function addUser(email, password) {
 }
 
 
+
+
 // app.param('shortURL', (req, res, next) => {
 //   console.log('In params middleware');
 //   res.locals.shortURL = req.params.shortURL;
@@ -92,8 +94,11 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: addUser(req.body.email, req.body.password)
+    // user: req.cookies["user"]
   };
+
+  // console.log(templateVars.userobj);
   res.render("urls_index", templateVars);
 });
 
@@ -101,7 +106,8 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: addUser(req.body.email, req.body.password)
+    // username: req.cookies["username"]
   };
   res.render("urls_new", templateVars);
 });
@@ -137,7 +143,9 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL,
     longURL,
-    username: req.cookies["username"] }
+    user: addUser(req.body.email, req.body.password)
+    // username: req.cookies["username"]
+  }
   res.render("urls_show", templateVars);
 });
 
@@ -199,14 +207,19 @@ app.post("/register", (req, res) => {
   }
 
   //add new user object into the user object
-  let user = addUser(req.body.email, req.body.password);   //now can call user.email user.password etc
+  let newUser = addUser(req.body.email, req.body.password);   //now can call user.email user.password etc
 
   //set cookie for random generated id (comes from the object from addUser)
-  res.cookie('user_id', user.id);
-
+  // res.cookie('user_id', newUser.id);//set header here
+  res.cookie('user', newUser.id);
   res.redirect('/urls');
 
-  console.log(users);
+  console.log(newUser);
+});
+
+//add login page
+app.get("/login", (req, res) => {
+  res.render("urls_login");
 });
 
 
