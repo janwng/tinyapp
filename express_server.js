@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-var app = express();
-var PORT = process.env.PORT || 8080; //default port 8080
+const app = express();
+const PORT = process.env.PORT || 8080; //default port 8080
 
 
 // Configuration
@@ -14,8 +14,8 @@ app.use(cookieParser());
 
 //function to generate 6 random numbers and letters
 function generateRandomString() {
-  var randomString = "";
-  var possCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomString = "";
+  let possCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   for (var i = 0; i < 6; i++) {
     randomString += possCharacters.charAt(Math.floor(Math.random() * possCharacters.length));
@@ -25,10 +25,20 @@ return randomString;
 }
 
 
-var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xk": "http://www.google.com"
+const urlDatabase = {
+  "userRandomID" : {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
 };
+
+
 
 // app.param('shortURL', (req, res, next) => {
 //   console.log('In params middleware');
@@ -66,7 +76,11 @@ app.get("/urls", (req, res) => {
 
 //add page for url input form
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 //log out the (longurl) link that user input into the form
@@ -105,7 +119,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 //delete to remove exisitng shortened uRLS from database
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
 
   //after delete redirect back to urls_index page
@@ -128,12 +142,20 @@ app.post("/login", (req, res) => {
   //and is what the user inputs into form
   res.cookie('username', req.body.username);
 
-
   //after server has set cookie redirect browser back to home
-  res.redirect('/');
-
+  res.redirect('/urls');
 });
 
+//log out and clear cookies and redirect
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+})
+
+//create registration page
+app.post("/register", (req, res) => {
+  res.render("urls_register");
+})
 
 
 
