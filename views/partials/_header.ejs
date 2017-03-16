@@ -1,1 +1,10 @@
 <title>TinyApp</title>
+
+<form action="/login" method="POST">
+  <!-- 'name=' must be same as value parameter in res.cookie(name, value, options) -->
+  <!-- 'value=' is whatever the user inputs into the form -->
+  <input type="text" name="username" value="">
+  <input type="submit" value="Submit">
+</form>
+
+<h5>Your Username: <%= username %></h5>
