@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+
 const app = express();
 const PORT = process.env.PORT || 8080; //default port 8080
 
@@ -12,20 +13,14 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-//function to generate 6 random numbers and letters
-function generateRandomString() {
-  let randomString = "";
-  let possCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (var i = 0; i < 6; i++) {
-    randomString += possCharacters.charAt(Math.floor(Math.random() * possCharacters.length));
-  }
-
-return randomString;
-}
-
 
 const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xk": "http://www.google.com"
+};
+
+
+const users = {
   "userRandomID" : {
     id: "userRandomID",
     email: "user@example.com",
@@ -35,9 +30,37 @@ const urlDatabase = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
+  },
+  "user3RandomID": {
+    id: "user3RandomID",
+    email: "user3@example.com",
+    password: "funny-bunny"
   }
 };
 
+//function to generate 6 random numbers and letters
+function generateRandomString() {
+  let randomString = "";
+  let possCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 6; i++) {
+    randomString += possCharacters.charAt(Math.floor(Math.random() * possCharacters.length));
+  }
+  return randomString;
+}
+
+
+function addUser(email, password) {
+  var newUserID = generateRandomString(); //should be randomly generated
+
+  users[newUserID] = {};
+
+  users[newUserID].id = newUserID; //random generated with old function
+  users[newUserID].email = email; //user will input
+  users[newUserID].password = password; //user will input
+
+  return users[newUserID];
+}
 
 
 // app.param('shortURL', (req, res, next) => {
@@ -119,7 +142,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 //delete to remove exisitng shortened uRLS from database
-app.delete("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
 
   //after delete redirect back to urls_index page
@@ -150,12 +173,45 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls');
-})
+});
+
+//can delete? renders the registration page
+app.get("/register", (req, res) => {
+    res.render("urls_register");
+});
 
 //create registration page
 app.post("/register", (req, res) => {
-  res.render("urls_register");
-})
+
+  //add new user object into the user object
+  let user = addUser(req.body.email, req.body.password);   //now can call user.email user.password etc
+
+  //set cookie for random generated id (comes from the object from addUser)
+  res.cookie('user_id', user.id);
+
+  //send error if no email/pw input
+  if(!req.body.email || !req.body.password) {
+    res.status(400).send('Please input email and password'); // should this be res.status?
+  } else {
+    res.redirect('/urls');
+  }
+
+  //send error if email already exists by checking in users object
+  for (let randomID in users) {
+    if(req.body.email === users[randomID].email) {
+      var emailExists = true;
+    }
+  }
+
+  if(emailExists) {
+    res.status(400).send('Email already exists');
+  } else if (emailExists === false ) {
+    res.redirect('/urls');
+  }
+
+  console.log(users);
+
+});
 
 
 
