@@ -46,6 +46,7 @@ const urlDatabase = {
   }
 };
 
+
   //   "b2xVn2": {
   //     url: "http://www.lighthouselabs.ca",
   //     user: ""
@@ -128,7 +129,7 @@ app.get("/urls/new", (req, res) => {
   if(req.cookies["user_id"]) {
     res.render("urls_new", templateVars);
   } else {
-    res.redirect("/login");
+    res.status(401).render("urls_401");
   }
 });
 
@@ -151,9 +152,6 @@ app.post("/urls", (req, res, next) => {
 app.get("/u/:shortURL", (req, res) => {
   for (var userId in urlDatabase) {
     let longURL = urlDatabase[userId][req.params.shortURL];
-      console.log("FOUND IT", urlDatabase);
-      console.log("shortURL:", req.params.shortURL);
-      console.log("longURL:", longURL);
     if (longURL !== undefined) {
       res.redirect(longURL);
       return;
@@ -182,9 +180,21 @@ app.get("/urls/:shortURL", (req, res) => {
 //delete to remove exisitng shortened uRLS from database
 app.post("/urls/:shortURL/delete", (req, res) => {
 
-
-  // delete urlDatabase[req.params.shortURL];
-  delete urlDatabase[req.cookies.user_id][req.params.shortURL];
+  //check if logged in (cookie)
+  if (req.cookies.user_id) {
+    var userUrls = urlDatabase[req.cookies.user_id];
+    //if logged in (can be hacked!),
+    //so check if the url belongs to the logged in user
+    //AND check that its not undefined
+    if(userUrls && userUrls[req.params.shortURL] !== undefined) {
+      delete userUrls[req.params.shortURL];
+    } else {
+      console.log("this message should never display!");
+    }
+  } else {
+  //if not logged in
+    res.status(401).render('urs_401');
+  }
 
 
   //after delete redirect back to urls_index page
@@ -195,7 +205,23 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   //make the long url in object = to long url that was input in the form
   // urlDatabase[req.params.shortURL] = req.body.longURL;
-  urlDatabase[req.cookies.user_id][req.params.shortURL] = req.body.longURL;
+
+  //check if logged in (cookie)
+  if (req.cookies.user_id) {
+    var userUrls = urlDatabase[req.cookies.user_id];
+    //if logged in (can be hacked!),
+    //so check if the url belongs to the logged in user
+    //AND check that its not undefined
+    if(userUrls && userUrls[req.params.shortURL] !== undefined) {
+      userUrls[req.params.shortURL] = req.body.longURL;
+    } else {
+      console.log("this message should never display!");
+    }
+  } else {
+  //if not logged in
+    res.status(401).render('urs_401');
+  }
+
   // addUrlToUser(req.cookies["user_id"], req.params.shortUrl, req.body.longURL);
   //after updating, redirect client back to index page
   res.redirect('/urls');
@@ -235,7 +261,7 @@ app.post("/login", (req, res) => {
     }
     //if not send a 403 status
     else {
-      res.status(403).send('Email and password do not match');
+      res.status(401).send('Email and password do not match');
     }
   }
   //if email DOESNT exist, send 403 status
