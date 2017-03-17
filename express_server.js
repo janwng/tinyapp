@@ -92,23 +92,22 @@ app.get("/hello", (req, res) => {
 });
 //add route handler for urls
 app.get("/urls", (req, res) => {
+
+  //read the value of the cookie
+
   let templateVars = {
     urls: urlDatabase,
-    user: users
-    // user: req.cookies["user"]
+    user: req.cookies["user_id"]
   };
-  console.log("TEMPLATE VARS:",templateVars.user);
-
-  // console.log(templateVars.userobj);
   res.render("urls_index", templateVars);
+  //res.render("urls_index",{user:flag});
 });
 
 //add page for url input form
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    user: addUser(req.body.email, req.body.password)
-    // username: req.cookies["username"]
+    user: req.cookies["user_id"]
   };
   res.render("urls_new", templateVars);
 });
@@ -116,16 +115,12 @@ app.get("/urls/new", (req, res) => {
 //log out the (longurl) link that user input into the form
 app.post("/urls", (req, res, next) => {
   console.log("req.body: ", req.body);
-  // res.send("Ok");
 
   let longURL = req.body.longURL;
   let shortURL = generateRandomString();
 
   //add new longurl & short url to the urldatabse obj
   urlDatabase[shortURL] = longURL;
-
-//   console.log(urlDatabase);
-// }, function(req, res) {
 
   //redirect page
   res.redirect('/urls/'+shortURL);
@@ -144,8 +139,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL,
     longURL,
-    user: addUser(req.body.email, req.body.password)
-    // username: req.cookies["username"]
+    user: req.cookies["user_id"]
   }
   res.render("urls_show", templateVars);
 });
@@ -175,7 +169,6 @@ app.get("/login", (req, res) => {
 //create log in route and set cookie for username
 app.post("/login", (req, res) => {
 
-
   //check if input email matches an email in database
 
   //var matching is whether input email is same as database email
@@ -185,7 +178,6 @@ app.post("/login", (req, res) => {
   //check if the email exists in database
   for(var user in users) {
     if (req.body.email === users[user].email ){
-      console.log('IT MATCHES');
       matching = true;
 
       //find the correlating userID with the email
@@ -198,22 +190,19 @@ app.post("/login", (req, res) => {
   if(matching){ //matching is true if the matching is changed to true in the email match
     //check if the input password matches the correlating email
     if (req.body.password === users[userId].password) {
-      console.log("you are logged in");
-      //if login successful, set cookie to that users user id
+      var newUser = addUser(req.body.email, req.body.password);
       res.cookie('user_id', userId);
       res.redirect('/urls');
     }
     //if not send a 403 status
     else {
       res.status(403).send('Email and password do not match');
-      console.log("Email and password don't match");
     }
   }
   //if email DOESNT exist, send 403 status
   else{
     res.status(403).send('Email does not exist');
     //res.redirect('/login');
-    console.log("User email does not exists");
   }
 });
 
@@ -250,17 +239,11 @@ app.post("/register", (req, res) => {
   let newUser = addUser(req.body.email, req.body.password);   //now can call user.email user.password etc
 
   //set cookie for random generated id (comes from the object from addUser)
-  // res.cookie('user_id', newUser.id);//set header here
   res.cookie('user_id', newUser.id);
   res.redirect('/urls');
 
   console.log(newUser);
 });
-
-
-
-
-
 
 
 app.listen(PORT, () => {
