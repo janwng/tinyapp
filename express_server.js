@@ -109,7 +109,12 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user: req.cookies["user_id"]
   };
-  res.render("urls_new", templateVars);
+
+  if(req.cookies["user_id"]) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 //log out the (longurl) link that user input into the form
@@ -145,7 +150,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 //delete to remove exisitng shortened uRLS from database
-app.delete("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
 
   //after delete redirect back to urls_index page
