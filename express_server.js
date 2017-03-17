@@ -94,9 +94,10 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    user: addUser(req.body.email, req.body.password)
+    user: users
     // user: req.cookies["user"]
   };
+  console.log("TEMPLATE VARS:",templateVars.user);
 
   // console.log(templateVars.userobj);
   res.render("urls_index", templateVars);
@@ -177,6 +178,7 @@ app.post("/login", (req, res) => {
 
   //check if input email matches an email in database
 
+  //var matching is whether input email is same as database email
   var matching = false; //always start as false
   var userId;
 
@@ -197,27 +199,27 @@ app.post("/login", (req, res) => {
     //check if the input password matches the correlating email
     if (req.body.password === users[userId].password) {
       console.log("you are logged in");
+      //if login successful, set cookie to that users user id
+      res.cookie('user_id', userId);
       res.redirect('/urls');
     }
     //if not send a 403 status
     else {
       res.status(403).send('Email and password do not match');
       console.log("Email and password don't match");
-
     }
   }
-  //if email DOESNT exist send 403 status
+  //if email DOESNT exist, send 403 status
   else{
     res.status(403).send('Email does not exist');
     //res.redirect('/login');
     console.log("User email does not exists");
-
   }
 });
 
 //log out and clear cookies and redirect
 app.post("/logout", (req, res) => {
-  res.clearCookie('user');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -249,7 +251,7 @@ app.post("/register", (req, res) => {
 
   //set cookie for random generated id (comes from the object from addUser)
   // res.cookie('user_id', newUser.id);//set header here
-  res.cookie('user', newUser.id);
+  res.cookie('user_id', newUser.id);
   res.redirect('/urls');
 
   console.log(newUser);
