@@ -107,11 +107,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-<<<<<<< HEAD
-    username: req.cookies["username"]
-=======
     user: req.cookies["user_id"]
->>>>>>> feature/user-registration
   };
   res.render("urls_new", templateVars);
 });
@@ -172,21 +168,6 @@ app.get("/login", (req, res) => {
 
 //create log in route and set cookie for username
 app.post("/login", (req, res) => {
-
-<<<<<<< HEAD
-  //after server has set cookie redirect browser back to home
-  res.redirect('/urls');
-});
-
-app.post("/logout", (req, res) => {
-  res.clearCookie('username');
-  res.redirect('/urls');
-})
-
-app.get("/register", (req, res) => {
-  res.render("urls_register");
-})
-=======
   //check if input email matches an email in database
 
   //var matching is whether input email is same as database email
@@ -237,7 +218,6 @@ app.get("/register", (req, res) => {
 
 //create registration page
 app.post("/register", (req, res) => {
->>>>>>> feature/user-registration
 
   //check if email or password is input
   //send error if no email/pw input
