@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
+const bcrypt = require("bcrypt");
 
 const app = express();
 const PORT = process.env.PORT || 8080; //default port 8080
@@ -11,7 +12,12 @@ app.set("view engine", "ejs");
 
 // Middlewares
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.SESSION_SECRET || "FunnyBunny"],
+
+  maxAge: 24 * 60 * 60 * 1000
+}));
 
 
 const users = {
@@ -102,14 +108,13 @@ app.get("/", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-//add route with html response
 
 //add route handler for urls
 app.get("/urls", (req, res) => {
 
   //read the value of the cookie
 
-  let user_id = req.cookies["user_id"];
+  let user_id = req.session.user_id;
   let templateVars = {
     urls: urlDatabase[user_id],
     user: user_id
@@ -120,13 +125,15 @@ app.get("/urls", (req, res) => {
 
 //add page for url input form
 app.get("/urls/new", (req, res) => {
-  let user_id = req.cookies["user_id"];
+  // let user_id = req.cookies["user_id"];
+  let user_id = req.session.user_id;
   let templateVars = {
     urls: urlDatabase[user_id],
     user: user_id
   };
 
-  if(req.cookies["user_id"]) {
+  // if(req.cookies["user_id"]) {
+    if(req.session.user_id) {
     res.render("urls_new", templateVars);
   } else {
     res.status(401).render("urls_401");
@@ -142,7 +149,7 @@ app.post("/urls", (req, res, next) => {
 
   //add new longurl & short url to the urldatabse obj
   // urlDatabase[shortURL] = longURL;
-  addUrlToUser(req.cookies["user_id"], shortURL, longURL);
+  addUrlToUser(req.session.user_id, shortURL, longURL);
 
   //redirect page
   res.redirect('/urls/'+shortURL);
@@ -164,7 +171,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 //add page for displaying a single URL and its shortened form
 app.get("/urls/:shortURL", (req, res) => {
-  let user_id = req.cookies["user_id"];
+  let user_id = req.session.user_id;
 
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[user_id][shortURL];
@@ -181,8 +188,8 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
 
   //check if logged in (cookie)
-  if (req.cookies.user_id) {
-    var userUrls = urlDatabase[req.cookies.user_id];
+  if (req.session.user_id) {
+    var userUrls = urlDatabase[req.session.user_id];
     //if logged in (can be hacked!),
     //so check if the url belongs to the logged in user
     //AND check that its not undefined
@@ -207,8 +214,8 @@ app.post("/urls/:shortURL", (req, res) => {
   // urlDatabase[req.params.shortURL] = req.body.longURL;
 
   //check if logged in (cookie)
-  if (req.cookies.user_id) {
-    var userUrls = urlDatabase[req.cookies.user_id];
+  if (req.session.user_id) {
+    var userUrls = urlDatabase[req.session.user_id];
     //if logged in (can be hacked!),
     //so check if the url belongs to the logged in user
     //AND check that its not undefined
@@ -254,10 +261,14 @@ app.post("/login", (req, res) => {
   //if email does exist then do this:
   if(matching){ //matching is true if the matching is changed to true in the email match
     //check if the input password matches the correlating email
-    if (req.body.password === users[userId].password) {
+    var matchPassword = bcrypt.compareSync(req.body.password, users[userId].password);
+    if (matchPassword) {
       var newUser = addUser(req.body.email, req.body.password);
-      res.cookie('user_id', userId);
+      // res.cookie('user_id', userId);
+      req.session.user_id = "userId";
       res.redirect('/urls');
+      console.log("input pw", bcrypt.hashSync(req.body.password, 10));
+      console.log("db pw", users[userId].password);
     }
     //if not send a 403 status
     else {
@@ -273,7 +284,9 @@ app.post("/login", (req, res) => {
 
 //log out and clear cookies and redirect
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  delete req.session.user_id;
+  // res.clearCookie(req.session.user_id);
+
   res.redirect('/urls');
 });
 
@@ -300,11 +313,17 @@ app.post("/register", (req, res) => {
     }
   }
 
-  //add new user object into the user object
-  let newUser = addUser(req.body.email, req.body.password);   //now can call user.email user.password etc
+  const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  //if all good, add new user object into the users database
+  let newUser = addUser(req.body.email, hashedPassword);
+
 
   //set cookie for random generated id (comes from the object from addUser)
-  res.cookie('user_id', newUser.id);
+  //res.cookie('user_id', newUser.id);
+  req.session.user_id = "newUser.id";
+
   res.redirect('/urls');
 
   console.log(newUser);
