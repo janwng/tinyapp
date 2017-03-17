@@ -166,20 +166,58 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect('/urls');
 });
 
+//add login page
+app.get("/login", (req, res) => {
+  res.render("urls_login");
+});
+
 //create log in route and set cookie for username
 app.post("/login", (req, res) => {
-  //'username' is the name of cookie and is what user inputs in form
-  //req.body.username -> 'username' corresponds with form name in _header.ejs
-  //and is what the user inputs into form
-  res.cookie('username', req.body.username);
 
-  //after server has set cookie redirect browser back to home
-  res.redirect('/urls');
+
+  //check if input email matches an email in database
+
+  var matching = false; //always start as false
+  var userId;
+
+  //check if the email exists in database
+  for(var user in users) {
+    if (req.body.email === users[user].email ){
+      console.log('IT MATCHES');
+      matching = true;
+
+      //find the correlating userID with the email
+      userId = users[user].id;
+      break;
+    }  //if bracket ends here
+  }
+
+  //if email does exist then do this:
+  if(matching){ //matching is true if the matching is changed to true in the email match
+    //check if the input password matches the correlating email
+    if (req.body.password === users[userId].password) {
+      console.log("you are logged in");
+      res.redirect('/urls');
+    }
+    //if not send a 403 status
+    else {
+      res.status(403).send('Email and password do not match');
+      console.log("Email and password don't match");
+
+    }
+  }
+  //if email DOESNT exist send 403 status
+  else{
+    res.status(403).send('Email does not exist');
+    //res.redirect('/login');
+    console.log("User email does not exists");
+
+  }
 });
 
 //log out and clear cookies and redirect
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user');
   res.redirect('/urls');
 });
 
@@ -217,10 +255,7 @@ app.post("/register", (req, res) => {
   console.log(newUser);
 });
 
-//add login page
-app.get("/login", (req, res) => {
-  res.render("urls_login");
-});
+
 
 
 
