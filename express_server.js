@@ -100,30 +100,44 @@ function addUser(email, password) {
 }
 
 
-//add endpoint for root directory
+// Get root directory
 app.get("/", (req, res) => {
-  res.end("Hello!");
-});
-//add additional endpoint
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-//add route handler for urls
-app.get("/urls", (req, res) => {
-
-  //read the value of the cookie
-
   let user_id = req.session.user_id;
   let templateVars = {
     urls: urlDatabase[user_id],
     user: user_id
   };
+  if(req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
   res.render("urls_index", templateVars);
-  //res.render("urls_index",{user:flag});
 });
 
-//add page for url input form
+
+// Add endpoint for json
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+// Get /urls
+app.get("/urls", (req, res) => {
+  let user_id = req.session.user_id;
+  let templateVars = {
+    urls: urlDatabase[user_id],
+    // email: users[user_id].email,
+    user: user_id
+  };
+
+  if(req.session.user_id) {
+    res.render("urls_index", templateVars);
+  } else {
+    res.status(401).render("urls_401");
+  }
+});
+
+// Get page for input form for new URLS
 app.get("/urls/new", (req, res) => {
   // let user_id = req.cookies["user_id"];
   let user_id = req.session.user_id;
@@ -133,10 +147,10 @@ app.get("/urls/new", (req, res) => {
   };
 
   // if(req.cookies["user_id"]) {
-    if(req.session.user_id) {
-    res.render("urls_new", templateVars);
+  if(req.session.user_id) {
+  res.render("urls_new", templateVars);
   } else {
-    res.status(401).render("urls_401");
+  res.status(401).render("urls_401");
   }
 });
 
@@ -147,12 +161,14 @@ app.post("/urls", (req, res, next) => {
   let longURL = req.body.longURL;
   let shortURL = generateRandomString();
 
-  //add new longurl & short url to the urldatabse obj
-  // urlDatabase[shortURL] = longURL;
-  addUrlToUser(req.session.user_id, shortURL, longURL);
+  if (req.session.user_id) {
+    addUrlToUser(req.session.user_id, shortURL, longURL);
+    res.redirect('/urls/'+shortURL);
+    return;
+  }
 
+  res.status(401).render("urls_401");
   //redirect page
-  res.redirect('/urls/'+shortURL);
 });
 
 //if user inputs short url send them to the long url website
@@ -167,21 +183,43 @@ app.get("/u/:shortURL", (req, res) => {
   res.status(404).send('url does not exist');//must be outside for loop or else it will loop around
 })
 
-
-
 //add page for displaying a single URL and its shortened form
 app.get("/urls/:shortURL", (req, res) => {
   let user_id = req.session.user_id;
 
-  let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[user_id][shortURL];
-
-  let templateVars = {
-    shortURL,
-    longURL,
-    user: users[user_id]
+  if(!req.session.user_id) {
+    res.status(401).render("urls_401");
+    return;
   }
-  res.render("urls_show", templateVars);
+
+  let shortURL = req.params.shortURL;
+
+
+  console.log("url database: ", urlDatabase);
+  console.log("user id", user_id);
+
+  for (userId in urlDatabase){
+    let userUrls = urlDatabase[userId];
+    for (url in userUrls) {
+      if (shortURL === url) {
+        if (userId === user_id) {
+         let longURL = urlDatabase[user_id][shortURL];
+
+          let templateVars = {
+            shortURL,
+            longURL,
+            urls: urlDatabase[user_id],
+            user: users[user_id]
+          }
+          res.render("urls_show", templateVars);
+        } else {
+          res.status(403).render("urls_403");
+        }
+        return;
+      }
+    }
+  }
+  res.status(404).render("urls_404");
 });
 
 //delete to remove exisitng shortened uRLS from database
@@ -265,20 +303,19 @@ app.post("/login", (req, res) => {
     if (matchPassword) {
       var newUser = addUser(req.body.email, req.body.password);
       // res.cookie('user_id', userId);
-      req.session.user_id = "userId";
+      req.session.user_id = userId;
       res.redirect('/urls');
       console.log("input pw", bcrypt.hashSync(req.body.password, 10));
       console.log("db pw", users[userId].password);
     }
-    //if not send a 403 status
+    //if not send a 401 status
     else {
-      res.status(401).send('Email and password do not match');
+      res.status(401).render("urls_401");
     }
   }
   //if email DOESNT exist, send 403 status
   else{
-    res.status(403).send('Email does not exist');
-    //res.redirect('/login');
+    res.status(401).render("urls_401");
   }
 });
 
@@ -286,13 +323,16 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   delete req.session.user_id;
   // res.clearCookie(req.session.user_id);
-
-  res.redirect('/urls');
+  res.redirect('/');
 });
 
 //can delete? renders the registration page
 app.get("/register", (req, res) => {
+  if(req.session.user_id) {
+    res.redirect("/");
+  } else {
     res.render("urls_register");
+  }
 });
 
 //create registration page
@@ -319,12 +359,11 @@ app.post("/register", (req, res) => {
   //if all good, add new user object into the users database
   let newUser = addUser(req.body.email, hashedPassword);
 
-
   //set cookie for random generated id (comes from the object from addUser)
   //res.cookie('user_id', newUser.id);
-  req.session.user_id = "newUser.id";
+  req.session.user_id = newUser.id;
 
-  res.redirect('/urls');
+  res.redirect('/');
 
   console.log(newUser);
 });

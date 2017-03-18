@@ -25,6 +25,17 @@
     <input type="submit" value="UPDATE">
   </form>
 
+   <% for (item in urls) { %>
+
+    <form action="/urls/<%= item %>/delete" method="POST">
+      <button>DELETE</button>
+    </form>
+  <% } %>
+
+
+
+
+
   <br>
   <br>
 
