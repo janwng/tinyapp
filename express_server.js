@@ -184,7 +184,7 @@ app.get("/u/:shortURL", (req, res) => {
       return;
     }
   }
-  res.status(404).send('url does not exist');//must be outside for loop or else it will loop around
+  res.status(404).render("urls_404");//must be outside for loop or else it will loop around
 })
 
 //add page for displaying a single URL and its shortened form
@@ -317,7 +317,7 @@ app.post("/login", (req, res) => {
       res.status(401).render("urls_401");
     }
   }
-  //if email DOESNT exist, send 403 status
+  //if email DOESNT exist, send 401 status
   else{
     res.status(401).render("urls_401");
   }
