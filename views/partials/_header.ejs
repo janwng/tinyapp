@@ -2,10 +2,10 @@
 <nav class="navbar">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">TinyApp</a>
+      <a class="navbar-brand" href="/urls">TinyApp</a>
     </div>
     <ul class="nav navbar-nav">
-      <li><a href="/urls">My Links</a></li>
+      <li><p class="navbar-text"><a href="/urls">My Links</a></p></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><p class="navbar-text"><span class="glyphicon glyphicon-user"></span>
@@ -13,7 +13,7 @@
 
       <li>
         <form action="/logout" method="POST">
-          <a class="navbar-text" href="#"><span class="glyphicon glyphicon-log-out"></span> LOGOUT</a>
+          <button class="btn navbar-btn" href="/urls"><span class="glyphicon glyphicon-log-out"></span> LOGOUT</button>
         </form>
       </li>
     </ul>
@@ -37,32 +37,3 @@
 </nav>
 
 <% } %>
-
-
-
-
-
-
-<!--
-    <% if (user) { %>
-    <li>
-      <p> Hello, <%= user.email %></p>
-    </li>
-    <li>
-      <a href = "/urls">My Links</a>
-    </li>
-
-    <li>
-      <form action="/logout" method="POST">
-        <button class="btn custom-button" id="logout">
-          LOGOUT
-        </button>
-      </form>
-    </li>
-
-    <% } else { %>
-
-      <a href="/register"><h3>Create an Account</h3></a>
-      <a href="/login"><h3>Log In</h3></a>
-
-    <% } %> -->

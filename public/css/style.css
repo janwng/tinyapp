@@ -101,6 +101,35 @@ strong {
 .navbar-brand {
   font-family: 'Varela Round', sans-serif;
   font-weight:700;
-
 }
 
+.create-link-title {
+  color: #fff;
+  margin-top:130px;
+  font-weight:700;
+  font-size:70px;
+  font-family: 'Varela Round', sans-serif;
+}
+
+#new-url-form {
+  width:600px;
+  margin:0 auto;
+  background-color:transparent;
+  margin-top:70px;
+  border:3px solid #ff3333;
+  border-radius: 0px;
+  padding-left:23px;
+  padding-right:23px;
+  height:50px;
+  font-family: 'Roboto', sans-serif;
+  font-weight:300;
+  font-size:14px;
+  color:white;
+}
+
+#submit-button {
+  padding:14px;
+  height:50px;
+  width:120px;
+  font-size:13px;
+}
