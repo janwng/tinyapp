@@ -1,0 +1,106 @@
+body {
+  background-color: #25258e;
+  color: #f1f1f1;
+  font-family: 'Roboto', sans-serif;
+}
+
+.user {
+  color: #fff;
+  margin-top:50px;
+  font-weight:700;
+  font-size:70px;
+  font-family: 'Varela Round', sans-serif;
+}
+
+.url-box {
+  width:600px;
+  border:6px solid #ff3333;
+  margin-top:70px;
+  padding-right:30px;
+  padding-bottom:30px;
+}
+
+.url-indv {
+  padding-top:30px;
+}
+
+.btn {
+  background-color:transparent;
+}
+
+#delete{
+  float:left;
+}
+
+#edit{
+  font-weight:500;
+}
+
+.btn:hover{
+  color:#ff3333;
+}
+
+#edit {
+  border:0px;
+  float:right;
+}
+
+a{
+  color:white;
+}
+
+a:link{
+  text-decoration: none;
+}
+
+a:hover{
+  color:#ff3333;
+}
+
+.url-links {
+  color:white;
+  font-size:18px;
+  font-weight:300;
+}
+
+strong {
+  font-family: 'Varela Round', sans-serif;
+  font-weight:700;
+  font-size:20px;
+}
+
+.custom-button{
+  background-color:transparent;
+  margin-top:70px;
+  border:3px solid #ff3333;
+  border-radius: 0px;
+  padding:17px;
+  width:300px;
+  font-family: 'Roboto', sans-serif;
+  font-weight:600;
+  font-size:14px;
+  letter-spacing:3px;
+  text-align: center;
+}
+
+.custom-button:hover {
+  background-color:transparent;
+  border:3px solid #ff3333;
+  color:#ff3333;
+}
+
+#logout {
+  margin-top:0;
+}
+
+.navbar {
+  font-family: 'Roboto', sans-serif;
+  font-weight:200;
+}
+
+.navbar-brand {
+  font-family: 'Varela Round', sans-serif;
+  font-weight:700;
+
+}
+

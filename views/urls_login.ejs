@@ -1,6 +1,12 @@
+<%- include partials/_head %>
+
+<body>
+
 <form action="/login" method="POST">
   <h1>Log In</h1>
   <input type="email" name="email" placeholder="email" value="">
   <input type="password" name="password" placeholder="password" value="">
   <input type="submit" value="Submit">
 </form>
+
+<%- include partials/_footer %>

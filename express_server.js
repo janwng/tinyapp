@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
+
 const app = express();
 const PORT = process.env.PORT || 8080; //default port 8080
 
@@ -11,6 +12,8 @@ const PORT = process.env.PORT || 8080; //default port 8080
 app.set("view engine", "ejs");
 
 // Middlewares
+app.use(express.static('public'));
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -40,7 +43,7 @@ const users = {
 
 const urlDatabase = {
   "user3RandomID": {
-    'd;lkjt6': 'https://example.com/wow_wow_wow',
+    'dlkjt6': 'https://example.com/wow_wow_wow',
     'asdf': 'http://google.ca'
   },
   "userRandomID" : {
@@ -99,13 +102,13 @@ function addUser(email, password) {
   return users[newUserID];
 }
 
-
 // Get root directory
 app.get("/", (req, res) => {
   let user_id = req.session.user_id;
+
   let templateVars = {
     urls: urlDatabase[user_id],
-    user: user_id
+    user: users[user_id]
   };
   if(req.session.user_id) {
     res.redirect("/urls");
@@ -124,15 +127,16 @@ app.get("/urls.json", (req, res) => {
 // Get /urls
 app.get("/urls", (req, res) => {
   let user_id = req.session.user_id;
-  let templateVars = {
-    urls: urlDatabase[user_id],
-    // email: users[user_id].email,
-    user: user_id
-  };
+  let user = users[user_id]
 
-  if(req.session.user_id) {
+  if(user) {
+    let templateVars = {
+      urls: urlDatabase[user_id],
+      user: user
+    };
     res.render("urls_index", templateVars);
   } else {
+    delete req.session.user_id;
     res.status(401).render("urls_401");
   }
 });
@@ -143,14 +147,14 @@ app.get("/urls/new", (req, res) => {
   let user_id = req.session.user_id;
   let templateVars = {
     urls: urlDatabase[user_id],
-    user: user_id
+    user: users[user_id]
   };
 
   // if(req.cookies["user_id"]) {
   if(req.session.user_id) {
-  res.render("urls_new", templateVars);
+    res.render("urls_new", templateVars);
   } else {
-  res.status(401).render("urls_401");
+    res.status(401).render("urls_401");
   }
 });
 
