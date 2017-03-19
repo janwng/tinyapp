@@ -133,3 +133,37 @@ strong {
   width:120px;
   font-size:13px;
 }
+
+#update-form {
+  width:470px;
+  margin:0 auto;
+  background-color:transparent;
+  margin-top:25px;
+  border:3px solid #fff;
+  border-radius: 0px;
+  padding-left:23px;
+  padding-right:23px;
+  height:50px;
+  font-family: 'Roboto', sans-serif;
+  font-weight:300;
+  font-size:14px;
+  color:white;
+}
+
+#update-submit-button {
+  padding:14px;
+  height:50px;
+  width:120px;
+  font-size:13px;
+  margin-top:25px;
+  border:3px solid #fff;
+}
+
+
+.update-url-title {
+  color: #fff;
+  margin-top:100px;
+  font-weight:700;
+  font-size:70px;
+  font-family: 'Varela Round', sans-serif;
+}
