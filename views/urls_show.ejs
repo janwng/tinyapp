@@ -13,13 +13,13 @@
 
           <ul class="url-indv">
 
-            <form action="/urls/<%= item %>/delete" method="POST">
+            <form action="/urls/<%= shortURL %>/delete" method="POST">
               <button class="btn" id="delete">
               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
               </button>
             </form>
 
-            <a class="url-links" href="/urls/<%= item%>">
+            <a class="url-links" href="/urls/<%= shortURL%>">
               <strong><%= shortURL %></strong>
               <span class="glyphicon glyphicon-flash" style="color:#ff3333" aria-hidden="true"></span>
               <%= longURL %>

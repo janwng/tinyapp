@@ -159,7 +159,6 @@ strong {
   border:3px solid #fff;
 }
 
-
 .update-url-title {
   color: #fff;
   margin-top:100px;
@@ -167,3 +166,14 @@ strong {
   font-size:70px;
   font-family: 'Varela Round', sans-serif;
 }
+
+#create-new-account{
+  border:3px solid #ff3333;
+  width:470px;
+  margin-top:140px;
+}
+
+
+
+
+
