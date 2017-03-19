@@ -3,10 +3,8 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
-
 const app = express();
-const PORT = process.env.PORT || 8080; //default port 8080
-
+const PORT = process.env.PORT || 8080;
 
 // Configuration
 app.set("view engine", "ejs");
@@ -22,9 +20,8 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000
 }));
 
-
 const users = {
-  "userRandomID" : {
+  "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
@@ -37,7 +34,7 @@ const users = {
   "user3RandomID": {
     id: "user3RandomID",
     email: "user3@example.com",
-    password: "funny-bunny",
+    password: "funny-bunny"
   }
 };
 
@@ -46,26 +43,17 @@ const urlDatabase = {
     'dlkjt6': 'https://example.com/wow_wow_wow',
     'asdf': 'http://google.ca'
   },
-  "userRandomID" : {
+  "userRandomID": {
     "b2xVn2": "http://www.lighthouselabs.ca",
     "9sm5xk": "http://www.google.com"
   },
-  "user2RandomID" : {
-    'qqqq': 'http://zombo.com'
+  "user2RandomID": {
+    'fe7F90': 'http://zombo.com'
   }
 };
 
-
-  //   "b2xVn2": {
-  //     url: "http://www.lighthouselabs.ca",
-  //     user: ""
-  //   }
-  //   "9sm5xk": "http://www.google.com"
-  // }
-
-
+//function to add user specific url to urlDatabase
 function addUrlToUser(userId, shortUrl, longUrl) {
-
   let userUrls = urlDatabase[userId];
 
   if (!userUrls) {
@@ -76,7 +64,6 @@ function addUrlToUser(userId, shortUrl, longUrl) {
     userUrls[shortUrl] = longUrl;
   }
 }
-
 
 //function to generate 6 random numbers and letters
 function generateRandomString() {
@@ -89,15 +76,18 @@ function generateRandomString() {
   return randomString;
 }
 
-
+//function to add a new user to user database
 function addUser(email, password) {
-  var newUserID = generateRandomString(); //should be randomly generated
+  var newUserID = generateRandomString();
 
   users[newUserID] = {};
 
-  users[newUserID].id = newUserID; //random generated with old function
-  users[newUserID].email = email; //user will input
-  users[newUserID].password = password; //user will input
+  //newUserID randomly generated
+  users[newUserID].id = newUserID;
+  //user will input email on form
+  users[newUserID].email = email;
+  //user will input password on form
+  users[newUserID].password = password;
 
   return users[newUserID];
 }
@@ -118,7 +108,6 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
 // Add endpoint for json
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -127,7 +116,7 @@ app.get("/urls.json", (req, res) => {
 // Get /urls
 app.get("/urls", (req, res) => {
   let user_id = req.session.user_id;
-  let user = users[user_id]
+  let user = users[user_id];
 
   if(user) {
     let templateVars = {
@@ -167,7 +156,7 @@ app.post("/urls", (req, res, next) => {
 
   if (req.session.user_id) {
     addUrlToUser(req.session.user_id, shortURL, longURL);
-    res.redirect('/urls/'+shortURL);
+    res.redirect('/urls/' + shortURL);
     return;
   }
 
@@ -184,8 +173,9 @@ app.get("/u/:shortURL", (req, res) => {
       return;
     }
   }
-  res.status(404).render("urls_404");//must be outside for loop or else it will loop around
-})
+  //this must be outside for loop or else it will loop around
+  res.status(404).render("urls_404");
+});
 
 //add page for displaying a single URL and its shortened form
 app.get("/urls/:shortURL", (req, res) => {
@@ -207,14 +197,14 @@ app.get("/urls/:shortURL", (req, res) => {
     for (url in userUrls) {
       if (shortURL === url) {
         if (userId === user_id) {
-         let longURL = urlDatabase[user_id][shortURL];
+          let longURL = urlDatabase[user_id][shortURL];
 
           let templateVars = {
             shortURL,
             longURL,
             urls: urlDatabase[user_id],
             user: users[user_id]
-          }
+          };
           res.render("urls_show", templateVars);
         } else {
           res.status(403).render("urls_403");
@@ -286,7 +276,8 @@ app.post("/login", (req, res) => {
   //check if input email matches an email in database
 
   //var matching is whether input email is same as database email
-  var matching = false; //always start as false
+  //matching should always start as false
+  var matching = false;
   var userId;
 
   //check if the email exists in database
@@ -297,11 +288,12 @@ app.post("/login", (req, res) => {
       //find the correlating userID with the email
       userId = users[user].id;
       break;
-    }  //if bracket ends here
+    }
   }
 
   //if email does exist then do this:
-  if(matching){ //matching is true if the matching is changed to true in the email match
+  //matching is true if the matching is changed to true in the email match
+  if(matching){
     //check if the input password matches the correlating email
     var matchPassword = bcrypt.compareSync(req.body.password, users[userId].password);
     if (matchPassword) {
@@ -311,14 +303,10 @@ app.post("/login", (req, res) => {
       res.redirect('/urls');
       console.log("input pw", bcrypt.hashSync(req.body.password, 10));
       console.log("db pw", users[userId].password);
-    }
-    //if not send a 401 status
-    else {
+    } else {
       res.status(401).render("urls_401");
     }
-  }
-  //if email DOESNT exist, send 401 status
-  else{
+  } else{
     res.status(401).render("urls_401");
   }
 });
@@ -345,15 +333,17 @@ app.post("/register", (req, res) => {
   //check if email or password is input
   //send error if no email/pw input
   if(!req.body.email || !req.body.password) {
-    res.status(400).send('Please input email and password'); // should this be res.status?
-    return; //end the response and don't excute code below
+    res.status(400).send('Please input email and password');
+    //return to end the response and don't excute code below
+    return;
   }
 
   //now check if the input email already exists
   for (let randomID in users) {
     if(req.body.email === users[randomID].email) {
       res.status(400).send('Email already exists');
-      return; //don't excute code below
+      //return so it doesn't excute code below
+      return;
     }
   }
 
@@ -372,7 +362,6 @@ app.post("/register", (req, res) => {
   console.log(newUser);
 });
 
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
-})
+});
